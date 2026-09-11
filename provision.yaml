@@ -1,0 +1,41 @@
+- name: Provision VMs
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    template_vmid:
+      node0: 9000
+      node1: 9001
+
+  vars_files:
+    - vault.yml
+
+  tasks:
+    - name: Clone template
+      community.proxmox.proxmox_kvm:
+        api_host: "192.168.1.160"
+        api_user: ansible@pve
+        api_token_id: ansible-api
+        api_token_secret: "{{ lookup('ansible.builtin.env', 'PVE_API_KEY') }}"
+
+        validate_certs: false
+
+        clone: debian-template
+        full: false
+
+        node: "{{ hostvars[item].pve_node }}"
+        vmid: "{{ template_vmid[hostvars[item].pve_node] }}"
+        newid: "{{ hostvars[item].vmid }}"
+        name: "{{ item }}"
+
+        net:
+          net0: "virtio,bridge=vmbr0"
+
+        ipconfig:
+          ipconfig0: "ip={{ hostvars[item].host }}/24,gw=192.168.1.1"
+
+        cicustom: "user=local:snippets/base_debian.yaml"
+
+        state: present
+
+      loop: "{{ groups['all'] }}"
