@@ -1,0 +1,46 @@
+- name: Deprovision VMs
+  hosts: localhost
+  gather_facts: false
+  ignore_errors: true
+
+  vars:
+    template_vmid:
+      node0: 9000
+      node1: 9001
+
+  vars_files:
+    - vault.yaml
+
+  tasks:
+    - name: Stop VMs
+      community.proxmox.proxmox_kvm:
+        api_host: "192.168.1.160"
+        api_user: ansible@pve
+        api_token_id: ansible-api
+        api_token_secret: "{{ pve_api_key }}"
+
+        validate_certs: false
+
+        node: "{{ hostvars[item].pve_node }}"
+        vmid: "{{ hostvars[item].vmid }}"
+        name: "{{ item }}"
+
+        state: stopped
+
+      loop: "{{ groups['all'] }}"
+    - name: Remove VMs
+      community.proxmox.proxmox_kvm:
+        api_host: "192.168.1.160"
+        api_user: ansible@pve
+        api_token_id: ansible-api
+        api_token_secret: "{{ pve_api_key }}"
+
+        validate_certs: false
+
+        node: "{{ hostvars[item].pve_node }}"
+        vmid: "{{ hostvars[item].vmid }}"
+        name: "{{ item }}"
+
+        state: absent
+
+      loop: "{{ groups['all'] }}"

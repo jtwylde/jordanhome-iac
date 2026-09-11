@@ -28,14 +28,63 @@
         newid: "{{ hostvars[item].vmid }}"
         name: "{{ item }}"
 
+        state: present
+
+      loop: "{{ groups['all'] }}"
+
+    - name: Configure networking
+      community.proxmox.proxmox_kvm:
+        api_host: "192.168.1.160"
+        api_user: ansible@pve
+        api_token_id: ansible-api
+        api_token_secret: "{{ pve_api_key }}"
+
+        validate_certs: false
+
+        node: "{{ hostvars[item].pve_node }}"
+        vmid: "{{ hostvars[item].vmid }}"
+        name: "{{ item }}"
+
+        update: true
+        update_unsafe: true
+
         net:
           net0: "virtio,bridge=vmbr0"
 
         ipconfig:
           ipconfig0: "ip={{ hostvars[item].host }}/24,gw=192.168.1.1"
 
-        cicustom: "user=local:snippets/base_debian.yaml"
-
         state: present
 
       loop: "{{ groups['all'] }}"
+
+    - name: Start VMs
+      community.proxmox.proxmox_kvm:
+        api_host: "192.168.1.160"
+        api_user: ansible@pve
+        api_token_id: ansible-api
+        api_token_secret: "{{ pve_api_key }}"
+
+        validate_certs: false
+
+        node: "{{ hostvars[item].pve_node }}"
+        vmid: "{{ hostvars[item].vmid }}"
+        name: "{{ item }}"
+
+        state: started
+
+      loop: "{{ groups['all'] }}"
+
+- name: Set hostnames
+  hosts: all
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Wait for SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 180
+
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
