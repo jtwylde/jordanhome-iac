@@ -8,7 +8,7 @@
       node1: 9001
 
   vars_files:
-    - vault.yml
+    - vault.yaml
 
   tasks:
     - name: Clone template
@@ -16,7 +16,7 @@
         api_host: "192.168.1.160"
         api_user: ansible@pve
         api_token_id: ansible-api
-        api_token_secret: "{{ lookup('ansible.builtin.env', 'PVE_API_KEY') }}"
+        api_token_secret: "{{ pve_api_key }}"
 
         validate_certs: false
 
