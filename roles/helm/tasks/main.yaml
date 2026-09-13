@@ -1,0 +1,35 @@
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gpg
+      - apt-transport-https
+    state: present
+
+- name: Download Helm signing key
+  ansible.builtin.get_url:
+    url: "{{ helm_apt_key_url }}"
+    dest: /tmp/helm.gpg
+    mode: "0644"
+
+- name: Install Helm signing key
+  ansible.builtin.command:
+    cmd: >
+      gpg --dearmor
+      --output {{ helm_apt_keyring }}
+      /tmp/helm.gpg
+  args:
+    creates: "{{ helm_apt_keyring }}"
+
+- name: Add Helm APT repository
+  ansible.builtin.apt_repository:
+    repo: "{{ helm_apt_repo }}"
+    filename: helm-stable-debian
+    state: present
+    update_cache: true
+- name: Install Helm
+  ansible.builtin.apt:
+    name: helm
+    state: present
+
+

@@ -6,6 +6,16 @@
     creates: /usr/local/bin/k3s
   when: ansible_host == k3s_master_node
 
+- name: Wait for master node to initialize
+  become: false
+  delegate_to: localhost
+  ansible.builtin.wait_for:
+    host: "{{ ansible_host }}"
+    port: 6443
+    delay: 5
+    timeout: 300
+  when: ansible_host == k3s_master_node
+
 - name: Read cluster token from master node
   ansible.builtin.slurp:
     src: /var/lib/rancher/k3s/server/node-token
@@ -17,10 +27,6 @@
   ansible.builtin.set_fact:
     k3s_token: "{{ k3s_token_raw.content | b64decode | trim }}"
 
-- name: Wait for master node to initialize
-  ansible.builtin.pause:
-    seconds: 30
-    
 - name: Install k3s nodes
   ansible.builtin.shell:
     cmd: >
