@@ -1,0 +1,32 @@
+- name: Bootstrap master k3s nodes
+  ansible.builtin.shell:
+    cmd: >
+      curl -sfL https://get.k3s.io |
+      sh -s - server --cluster-init --tls-san {{ ansible_host }}
+    creates: /usr/local/bin/k3s
+  when: ansible_host == k3s_master_node
+
+- name: Read cluster token from master node
+  ansible.builtin.slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  delegate_to: "{{ k3s_master_node }}"
+  run_once: true
+  register: k3s_token_raw
+
+- name: Set cluster token
+  ansible.builtin.set_fact:
+    k3s_token: "{{ k3s_token_raw.content | b64decode | trim }}"
+
+- name: Wait for master node to initialize
+  ansible.builtin.pause:
+    seconds: 30
+    
+- name: Install k3s nodes
+  ansible.builtin.shell:
+    cmd: >
+      curl -sfL https://get.k3s.io |
+      K3S_URL=https://{{ k3s_master_node }}:6443
+      K3S_TOKEN={{ k3s_token }}
+      sh -s - server
+    creates: /usr/local/bin/k3s
+  when: ansible_host != k3s_master_node
