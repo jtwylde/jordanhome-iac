@@ -1,4 +1,4 @@
-# Run Ansible Playbooks
+# Ansible Playbooks
 
 Run provision to provision all VMs
 `ansible-playbook provision.yaml -i inventory/hosts.yaml --vault-password-file .vaultpw`

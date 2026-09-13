@@ -1,5 +1,5 @@
 - name: Provision VMs
-  hosts: localhost
+  hosts: all
   gather_facts: false
 
   vars:
@@ -12,9 +12,10 @@
 
   tasks:
     - name: Clone template
+      delegate_to: localhost
       community.proxmox.proxmox_kvm:
-        api_host: "192.168.1.160"
-        api_user: ansible@pve
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
         api_token_id: ansible-api
         api_token_secret: "{{ pve_api_key }}"
 
@@ -23,27 +24,40 @@
         clone: debian-template
         full: false
 
-        node: "{{ hostvars[item].pve_node }}"
-        vmid: "{{ template_vmid[hostvars[item].pve_node] }}"
-        newid: "{{ hostvars[item].vmid }}"
-        name: "{{ item }}"
+        node: "{{ pve_node }}"
+        vmid: "{{ template_vmid[pve_node] }}"
+        newid: "{{ vmid }}"
+        name: "{{ inventory_hostname }}"
 
         state: present
-
-      loop: "{{ groups['all'] }}"
-
-    - name: Configure networking
+    - name: Stop VMs to configure networking
+      delegate_to: localhost
       community.proxmox.proxmox_kvm:
-        api_host: "192.168.1.160"
-        api_user: ansible@pve
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
         api_token_id: ansible-api
         api_token_secret: "{{ pve_api_key }}"
 
         validate_certs: false
 
-        node: "{{ hostvars[item].pve_node }}"
-        vmid: "{{ hostvars[item].vmid }}"
-        name: "{{ item }}"
+        node: "{{ pve_node }}"
+        vmid: "{{ vmid }}"
+        name: "{{ inventory_hostname }}"
+
+        state: stopped
+    - name: Configure networking
+      delegate_to: localhost
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
+        api_token_id: ansible-api
+        api_token_secret: "{{ pve_api_key }}"
+
+        validate_certs: false
+
+        node: "{{ pve_node }}"
+        vmid: "{{ vmid }}"
+        name: "{{ inventory_hostname }}"
 
         update: true
         update_unsafe: true
@@ -52,39 +66,31 @@
           net0: "virtio,bridge=vmbr0"
 
         ipconfig:
-          ipconfig0: "ip={{ hostvars[item].host }}/24,gw=192.168.1.1"
+          ipconfig0: "ip={{ ansible_host }}/24,gw=192.168.1.1"
 
         state: present
 
-      loop: "{{ groups['all'] }}"
-
     - name: Start VMs
+      delegate_to: localhost
       community.proxmox.proxmox_kvm:
-        api_host: "192.168.1.160"
-        api_user: ansible@pve
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
         api_token_id: ansible-api
         api_token_secret: "{{ pve_api_key }}"
 
         validate_certs: false
 
-        node: "{{ hostvars[item].pve_node }}"
-        vmid: "{{ hostvars[item].vmid }}"
-        name: "{{ item }}"
+        node: "{{ pve_node }}"
+        vmid: "{{ vmid }}"
+        name: "{{ inventory_hostname }}"
 
         state: started
 
-      loop: "{{ groups['all'] }}"
-
-- name: Set hostnames
-  hosts: all
-  gather_facts: false
-  become: true
-
-  tasks:
     - name: Wait for SSH
       ansible.builtin.wait_for_connection:
         timeout: 180
 
     - name: Set hostname
+      become: true
       ansible.builtin.hostname:
         name: "{{ inventory_hostname }}"

@@ -1,16 +1,10 @@
-all:
-  vars:
-    ansible_user: jtwylde
-    ansible_ssh_private_key_file: ~/.ssh/id_ed25519
-    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+k3s_nodes:
   hosts:
     k3s-node0:
-      host: 192.168.1.170
       ansible_host: 192.168.1.170
       vmid: 170
       pve_node: node0
     k3s-node1:
-      host: 192.168.1.171
       ansible_host: 192.168.1.171
       vmid: 171
       pve_node: node1
