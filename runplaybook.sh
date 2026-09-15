@@ -1,1 +1,1 @@
-ansible-playbook playbooks/$1 -i inventory/hosts.yaml --vault-password-file .vaultpw
+ansible-playbook playbooks/$1 --vault-password-file .vaultpw

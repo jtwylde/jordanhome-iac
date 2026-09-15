@@ -5,4 +5,8 @@ ansible_user: jtwylde
 ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-kubeconfig_location: "{{ playbook_dir | ansible.builtin.dirname }}/.config/kubeconfig.yaml"
+root_dir: "{{ playbook_dir | ansible.builtin.dirname }}"
+
+kubeconfig_location: "{{ root_dir }}/.config/kubeconfig.yaml"
+
+kubernetes_resources: "{{ root_dir }}/kubernetes_resources"
