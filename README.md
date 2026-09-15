@@ -28,3 +28,20 @@ Run deprovision to deprovision all VMs. Does the following:
 The master node defaults to the first node in the hosts list for k3s_nodes. See roles/k3s/defaults
 Running the playbook will bootstrap the master node and then join the other nodes into it to form the cluster
 `./runplaybook k3s.yaml`
+
+## Secrets
+Below secrets are configured in `vault.yaml`. A `.vaultpw` file is needed in the root of the project containing the plaintext password used to encrypt the vault.
+
+Generate new passwords as below:
+```
+ansible-vault encrypt_string '<secret>' \   main
+  --vault-password-file .vaultpw \
+  --name '<token_name>'
+```
+And copy the output into `vault.yaml`
+ 
+### pve_api_key
+The API key for the proxmox cluster
+
+### cloudflare_api_token
+The API token for cloudflare, used for DNS ACME challenges
