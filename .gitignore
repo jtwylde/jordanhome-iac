@@ -133,3 +133,4 @@ changelogs/.plugin-cache.yaml
 CLAUDE.local.md
 
 .vaultpw
+.config/*

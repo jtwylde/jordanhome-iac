@@ -36,3 +36,30 @@
       sh -s - server
     creates: /usr/local/bin/k3s
   when: ansible_host != k3s_master_node
+
+- name: Create kubeconfig dir
+  ansible.builtin.file:
+    path: /root/.kube/
+    state: directory
+    mode: '0755'
+
+- name: Symlink the kubeconfig
+  ansible.builtin.file:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /root/.kube/config
+    state: link
+
+- name: Fetch k3s kubeconfig
+  ansible.builtin.fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: .config/kubeconfig.yaml
+    flat: true
+  when: ansible_host == k3s_master_node
+
+- name: Fix local kubeconfig
+  become: false
+  ansible.builtin.replace:
+    path: "{{ kubeconfig_location }}"
+    regexp: 'https://127\.0\.0\.1:6443'
+    replace: 'https://{{ k3s_master_node }}:6443'
+  delegate_to: localhost

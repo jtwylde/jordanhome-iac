@@ -1,0 +1,1 @@
+api_endpoint: "{{ hostvars[groups['k3s_nodes'][0]].ansible_host }}"
