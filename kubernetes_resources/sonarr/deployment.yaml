@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  namespace: jellyfin
+  labels:
+    app.kubernetes.io/name: sonarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sonarr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sonarr
+    spec:
+      volumes:
+       # - name: config
+         # persistentVolumeClaim:
+         #   claimName: {{ .Values.sonarr.persistence.existingClaim | default (printf "%s-sonarr" .Release.Name) }}
+        - name: media
+          persistentVolumeClaim:
+            claimName: media-library-pvc
+      containers:
+        - name: sonarr
+          image: "linuxserver/sonarr"
+          volumeMounts:
+            - name: media
+              mountPath: /media
+          ports:
+            - name: http
+              containerPort: 8989
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"

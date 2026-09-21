@@ -10,14 +10,13 @@ persistence:
     storageClass: ''
   media:
     enabled: true
-    size: 100Gi
-    storageClass: ''
+    existingClaim: 'media-library-pvc'
 
 ingress:
   enabled: true
   className: 'traefik'
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/cluster-issuer: letsencrypt-staging
   tls:
   - hosts:
       - media.k3s.jordanhome.dev

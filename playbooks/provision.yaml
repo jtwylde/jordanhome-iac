@@ -8,7 +8,7 @@
       node1: 9001
 
   vars_files:
-    - vault.yaml
+    - ../vault/vault.yaml
 
   tasks:
     - name: Clone template
@@ -64,6 +64,8 @@
 
         net:
           net0: "virtio,bridge=vmbr0"
+
+        searchdomains: ''
 
         ipconfig:
           ipconfig0: "ip={{ ansible_host }}/24,gw=192.168.1.1"

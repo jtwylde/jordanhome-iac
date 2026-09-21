@@ -1,1 +1,1 @@
-ansible-playbook playbooks/$1 --vault-password-file .vaultpw
+ansible-playbook $1 --vault-password-file .vaultpw

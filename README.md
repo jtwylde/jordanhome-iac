@@ -14,20 +14,21 @@ Run provision to provision all VMs. Does the following:
 * Configures networking
 * Sets hostname
 
-`./runplaybook provision.yaml`
+`./runplaybook playbooks/provision.yaml`
 
 Run deprovision to deprovision all VMs. Does the following:
 * Removes stale SSH keys
 * Stops each VM
 * Removes each VM
-`./runplaybook deprovision.yaml`
+`./runplaybook playbooks/deprovision.yaml`
 
 
 ## K3S
 
 The master node defaults to the first node in the hosts list for k3s_nodes. See roles/k3s/defaults
 Running the playbook will bootstrap the master node and then join the other nodes into it to form the cluster
-`./runplaybook k3s.yaml`
+`./runplaybook playbooks/k3s.yaml`
+
 
 ## Secrets
 Below secrets are configured in `vault.yaml`. A `.vaultpw` file is needed in the root of the project containing the plaintext password used to encrypt the vault.

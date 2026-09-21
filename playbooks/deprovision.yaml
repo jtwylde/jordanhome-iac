@@ -4,9 +4,18 @@
   ignore_errors: true
 
   vars_files:
-    - vault.yaml
+    - ../vault/vault.yaml
+  vars_prompt:
+    - name: "confirmation"
+      prompt: "This playbook will destroy all VMs in the clutser. Are you sure you want to run this playbook? (Type 'YES' to continue)"
+      default: "NO"
+      private: false
 
   tasks:
+    - name: Abort playbook
+      ansible.builtin.meta: end_play
+      when: confirmation | upper != "YES"
+
     - name: Stop VMs
       delegate_to: localhost
       community.proxmox.proxmox_kvm:
