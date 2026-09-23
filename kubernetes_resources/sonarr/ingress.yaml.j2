@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: sonarr
+  name: sonarr
+  namespace: jellyfin
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: sonarr.{{ base_url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: sonarr
+            port:
+              name: http 
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - sonarr.{{ base_url }}
+    secretName: sonarr-web-cert
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.1.170
+    - ip: 192.168.1.171

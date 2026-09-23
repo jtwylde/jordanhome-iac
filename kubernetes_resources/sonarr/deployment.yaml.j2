@@ -16,18 +16,20 @@ spec:
         app.kubernetes.io/name: sonarr
     spec:
       volumes:
-       # - name: config
-         # persistentVolumeClaim:
-         #   claimName: {{ .Values.sonarr.persistence.existingClaim | default (printf "%s-sonarr" .Release.Name) }}
-        - name: media
+        - name: config
+          persistentVolumeClaim:
+            claimName: sonarr-config
+        - name: library
           persistentVolumeClaim:
             claimName: media-library-pvc
       containers:
         - name: sonarr
           image: "linuxserver/sonarr"
           volumeMounts:
-            - name: media
-              mountPath: /media
+            - name: config
+              mountPath: /config
+            - name: library
+              mountPath: /library
           ports:
             - name: http
               containerPort: 8989

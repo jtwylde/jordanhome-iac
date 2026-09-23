@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: qbittorrent-service
+  name: qbittorrent
+  namespace: jellyfin
+spec:
+  ports:
+  - name: http
+    port: 8090
+    protocol: TCP
+    targetPort: http
+  - name: torrenttcp
+    port: 6881
+    protocol: TCP
+    targetPort: torrenttcp
+  - name: torrentudp
+    port: 6881
+    protocol: UDP
+    targetPort: torrentudp
+  
+  selector:
+    app.kubernetes.io/name: qbittorrent
+  type: ClusterIP

@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: jellyseerr
+  name: jellyseerr
+  namespace: jellyfin
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: request.{{ base_url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: jellyseerr
+            port:
+              name: http 
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - request.{{ base_url }}
+    secretName: jellyseerr-web-cert
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.1.170
+    - ip: 192.168.1.171

@@ -2,29 +2,29 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: {{ issuer }}
   generation: 1
   labels:
-    app.kubernetes.io/instance: sonarr
-  name: sonarr
+    app.kubernetes.io/instance: qbittorrent
+  name: qbittorrent
   namespace: jellyfin
 spec:
   ingressClassName: traefik
   rules:
-  - host: sonarr.media.k3s.jordanhome.dev
+  - host: qbit.{{ base_url }}
     http:
       paths:
       - backend:
           service:
-            name: sonarr
+            name: qbittorrent
             port:
               name: http 
         path: /
         pathType: Prefix
   tls:
   - hosts:
-    - sonarr.media.k3s.jordanhome.dev
-    secretName: sonarr-web-cert
+    - qbit.{{ base_url }}
+    secretName: qbittorrent-web-cert
 status:
   loadBalancer:
     ingress:

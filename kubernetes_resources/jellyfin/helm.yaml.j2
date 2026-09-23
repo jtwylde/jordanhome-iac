@@ -8,7 +8,7 @@ persistence:
     enabled: true
     size: 5Gi
     storageClass: ''
-  media:
+  library:
     enabled: true
     existingClaim: 'media-library-pvc'
 
@@ -16,13 +16,13 @@ ingress:
   enabled: true
   className: 'traefik'
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: {{ issuer }}
   tls:
   - hosts:
-      - media.k3s.jordanhome.dev
+      - {{ base_url }}
     secretName: jellyfin-web-cert
   hosts:
-    - host: media.k3s.jordanhome.dev
+    - host: {{ base_url }}
       paths:
         - path: /
           pathType: Prefix
