@@ -41,6 +41,7 @@ Running the playbook will bootstrap the master node and then join the other node
 Below secrets are configured in `vault.yaml`. A `.vaultpw` file is needed in the root of the project containing the plaintext password used to encrypt the vault.
 
 Generate new passwords as below:
+`./createsecret.sh <secret-name> <secret>`
 ```
 ansible-vault encrypt_string '<secret>' \
   --vault-password-file .vaultpw \

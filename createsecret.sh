@@ -1,0 +1,1 @@
+ansible-vault encrypt_string "$2" --vault-password-file .vaultpw --name $1

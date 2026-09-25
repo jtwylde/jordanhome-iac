@@ -37,5 +37,19 @@
   - name: Deploy LE Cluster Issuer
     kubernetes.core.k8s:
       state: present
+      src: "{{ kubernetes_resources }}/cert-manager/le-clusterissuer.yaml"
+
+  - name: Deploy LE Staging Cluster Issuer
+    kubernetes.core.k8s:
+      state: present
       src: "{{ kubernetes_resources }}/cert-manager/le-staging-clusterissuer.yaml"
+
+  - name: Setup kube-vip RBAC
+    kubernetes.core.k8s:
+      state: present
+      src: "{{ kubernetes_resources ~ '/kube-vip/rbac.yaml' }}"
+  - name: Deploy kube-vip
+    kubernetes.core.k8s:
+      state: present
+      src: "{{ kubernetes_resources ~ '/kube-vip/deployment.yaml' }}"
 

@@ -6,7 +6,7 @@
 
   vars:
     base_url: "media.k3s.jordanhome.dev"
-    issuer: "letsencrypt-staging"
+    issuer: "letsencrypt"
 
   environment: 
     K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
@@ -20,12 +20,12 @@
   - name: Setup NFS Sync PV
     kubernetes.core.k8s:
       state: present
-      definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/namespace.yaml.j2') | from_yaml }}"
+      definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/media-library-pv.yaml.j2') | from_yaml }}"
 
   - name: Setup NFS Sync PVC
     kubernetes.core.k8s:
       state: present
-      definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/namespace.yaml.j2') | from_yaml }}"
+      definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/media-library-pvc.yaml.j2') | from_yaml }}"
 
   - name: Add jellyfin repo
     kubernetes.core.helm_repository:

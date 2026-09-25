@@ -6,7 +6,7 @@
     ansible.builtin.shell:
       cmd: >
         curl -sfL https://get.k3s.io |
-        sh -s - server --cluster-init --tls-san {{ ansible_host }}
+        sh -s - server --cluster-init --tls-san=192.168.1.178
       creates: /usr/local/bin/k3s
     when: ansible_host == k3s_master_node
 
