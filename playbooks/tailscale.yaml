@@ -1,0 +1,13 @@
+- name: Install Tailscale
+  hosts: all
+  become: true
+
+  vars_files:
+    - ../vault/vault.yaml
+
+  roles:
+    - role: artis3n.tailscale.machine
+      vars:
+        tailscale_authkey: "{{ tailscale_auth_key }}"
+        state: latest
+        tailscale_args: "--ssh"

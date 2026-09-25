@@ -1,5 +1,12 @@
 # Ansible Playbooks
 
+## Setup
+1. Activate python venv
+
+2. Install requirements
+`pip3 install -r requirements.txt`
+`ansible-galaxy install -r ansible-galaxy-requirements.yaml`
+
 ## Utility Scripts
 `./runplaybook <playbook.yaml>` 
 Runs the given playbook with correct args and flags
@@ -35,7 +42,7 @@ Below secrets are configured in `vault.yaml`. A `.vaultpw` file is needed in the
 
 Generate new passwords as below:
 ```
-ansible-vault encrypt_string '<secret>' \   main
+ansible-vault encrypt_string '<secret>' \
   --vault-password-file .vaultpw \
   --name '<token_name>'
 ```
