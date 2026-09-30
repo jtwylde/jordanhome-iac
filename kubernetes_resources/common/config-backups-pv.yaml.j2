@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: media-library-pv
+  name: config-backups-pv
 spec:
   capacity:
-    storage: 2Ti
+    storage: 20Gi
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   nfs:
     server: {{ nas_ip }}
-    path: /volume1/JordanNAS/media-library
+    path: /volume1/Backups/config-backups

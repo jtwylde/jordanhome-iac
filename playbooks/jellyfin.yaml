@@ -17,15 +17,20 @@
       state: present
       definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/namespace.yaml.j2') | from_yaml }}"
 
-  - name: Setup NFS Sync PV
+  - name: Setup Media library NFS PV
     kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/media-library-pv.yaml.j2') | from_yaml }}"
 
-  - name: Setup NFS Sync PVC
+  - name: Setup Media library NFS PVC
     kubernetes.core.k8s:
       state: present
       definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/media-library-pvc.yaml.j2') | from_yaml }}"
+
+  - name: Setup Config backup NFS PVC
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('template', kubernetes_resources ~ '/jellyfin/media-config-backups-pvc.yaml.j2') | from_yaml }}"
 
   - name: Add jellyfin repo
     kubernetes.core.helm_repository:

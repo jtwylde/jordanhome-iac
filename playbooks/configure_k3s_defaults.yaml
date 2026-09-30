@@ -53,3 +53,7 @@
       state: present
       src: "{{ kubernetes_resources ~ '/kube-vip/deployment.yaml' }}"
 
+  - name: Setup config backup NFS PV
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('template', kubernetes_resources ~ '/common/config-backups-pv.yaml.j2') | from_yaml }}"

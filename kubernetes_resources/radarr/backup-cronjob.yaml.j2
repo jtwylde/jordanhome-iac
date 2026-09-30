@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: radarr-backup-cron
+  namespace: jellyfin
+spec:
+  schedule: "{{ config_backup_cron }}"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: radarr-backup
+              image: alpine:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  mkdir -p /dest/radarr/
+                  [ -d "/source/Backups/scheduled" ] && cp -TR /source/Backups/scheduled/ /dest/radarr/scheduled/
+                  [ -d "/source/Backups/manual" ] && cp -TR /source/Backups/manual/ /dest/radarr/manual/
+
+              volumeMounts:
+                - name: source
+                  mountPath: /source
+                  readOnly: true
+                - name: dest
+                  mountPath: /dest
+
+          volumes:
+            - name: source
+              persistentVolumeClaim:
+                claimName: radarr-config
+            - name: dest
+              persistentVolumeClaim:
+                claimName: media-config-backups-pvc
+

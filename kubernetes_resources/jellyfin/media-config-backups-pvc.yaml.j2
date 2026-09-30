@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: media-library-pvc
+  name: media-config-backups-pvc
   namespace: jellyfin
 spec:
   accessModes:
@@ -9,5 +9,5 @@ spec:
   storageClassName: ""
   resources:
     requests:
-      storage: 2Ti
-  volumeName: "media-library-pv"
+      storage: 20Gi
+  volumeName: "config-backups-pv"
