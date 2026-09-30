@@ -14,7 +14,7 @@ root_dir: "{{ playbook_dir | ansible.builtin.dirname }}"
 k3s_master_node: "{{ hostvars[groups['k3s_nodes'][0]].ansible_host }}"
 kubeconfig_location: "{{ root_dir }}/.config/kubeconfig.yaml"
 kubernetes_resources: "{{ root_dir }}/kubernetes_resources"
-k3s_vip_address: 192.168.1.175
+k3s_vip_address: 192.168.1.205
 
 # Infra
 nas_ip: 192.168.1.111
