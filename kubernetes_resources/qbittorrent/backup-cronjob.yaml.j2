@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: qbittorrent-backup-cron
+  namespace: jellyfin
+spec:
+  schedule: "{{ config_backup_cron }}"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: qbittorrent-backup
+              image: alpine:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  mkdir -p /dest/qbittorrent/
+                  tar -czf "/dest/qbittorrent/qbittorrent-$(date +%Y-%m-%d).tar.gz" /source/qBittorrent
+                  ls -1t /dest/qbittorrent/qbittorrent-*.tar.gz | tail -n +6 | xargs -r rm --
+
+              volumeMounts:
+                - name: source
+                  mountPath: /source
+                  readOnly: true
+                - name: dest
+                  mountPath: /dest
+
+          volumes:
+            - name: source
+              persistentVolumeClaim:
+                claimName: qbittorrent-config
+            - name: dest
+              persistentVolumeClaim:
+                claimName: media-config-backups-pvc
+

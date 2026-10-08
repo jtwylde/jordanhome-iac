@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: jellyseerr-backup-cron
+  namespace: jellyfin
+spec:
+  schedule: "{{ config_backup_cron }}"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: jellyseerr-backup
+              image: keinos/sqlite3:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  mkdir -p /dest/jellyseerr/
+                  sqlite3 /source/db/db.sqlite3 ".backup /tmp/db.sqlite3"
+                  cp /source/settings.json /tmp/
+                  tar -czf "/dest/jellyseerr/jellyseerr-$(date +%Y-%m-%d).tar.gz" -C /tmp db.sqlite3 settings.json
+                  ls -1t /dest/jellyseerr/jellyseerr-*.tar.gz | tail -n +6 | xargs -r rm --
+
+              volumeMounts:
+                - name: source
+                  mountPath: /source
+                  readOnly: true
+                - name: dest
+                  mountPath: /dest
+
+          volumes:
+            - name: source
+              persistentVolumeClaim:
+                claimName: jellyseerr-config
+            - name: dest
+              persistentVolumeClaim:
+                claimName: media-config-backups-pvc
+
