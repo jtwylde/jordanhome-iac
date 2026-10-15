@@ -2,13 +2,14 @@ replicaCount: 1
 
 image:
   pullPolicy: IfNotPresent
+  tag: "10.11.0"
 
 persistence:
   config:
     enabled: true
     size: 5Gi
     storageClass: ''
-  library:
+  media:
     enabled: true
     existingClaim: 'media-library-pvc'
 

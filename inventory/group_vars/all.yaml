@@ -18,6 +18,7 @@ k3s_vip_address: 192.168.1.205
 
 # Infra
 nas_ip: 192.168.1.111
+dns_ip: 192.168.1.5
 
 # jellyfin
 config_backup_cron: "0 15 * * *"

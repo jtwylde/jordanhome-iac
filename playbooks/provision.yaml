@@ -45,6 +45,7 @@
         name: "{{ inventory_hostname }}"
 
         state: stopped
+
     - name: Configure networking
       delegate_to: localhost
       community.proxmox.proxmox_kvm:
@@ -96,3 +97,25 @@
       become: true
       ansible.builtin.hostname:
         name: "{{ inventory_hostname }}"
+
+    - name: Create resolved config dir
+      become: true
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d/
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Create resolved config
+      become: true
+      ansible.builtin.template:
+        src: "{{ root_dir }}/templates/resolved-jordanhome.conf.j2"
+        dest: /etc/systemd/resolved.conf.d/00-jordanhome-dns.conf
+        mode: '0644'
+
+    - name: Restart resolvectl service
+      become: true
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: restarted

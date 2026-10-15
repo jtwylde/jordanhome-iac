@@ -48,10 +48,11 @@
     kubernetes.core.k8s:
       state: present
       src: "{{ kubernetes_resources ~ '/kube-vip/rbac.yaml' }}"
+
   - name: Deploy kube-vip
     kubernetes.core.k8s:
       state: present
-      src: "{{ kubernetes_resources ~ '/kube-vip/deployment.yaml' }}"
+      definition: "{{ lookup('template', kubernetes_resources ~ '/kube-vip/deployment.yaml.j2') | from_yaml }}"
 
   - name: Setup config backup NFS PV
     kubernetes.core.k8s:
