@@ -5,7 +5,7 @@
     - ../vault/vault.yaml
 
   vars:
-    base_url: "media.k3s.jordanhome.dev"
+    base_url: "media.jordanhome.dev"
     issuer: "letsencrypt"
 
   environment: 

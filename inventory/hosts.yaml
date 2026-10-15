@@ -1,10 +1,20 @@
-k3s_nodes:
-  hosts:
-    k3s-node0:
-      ansible_host: 192.168.1.170
-      vmid: 170
-      pve_node: node0
-    k3s-node1:
-      ansible_host: 192.168.1.171
-      vmid: 171
-      pve_node: node1
+all:
+  children:
+    k3s_nodes:
+      hosts:
+        k3s-node0:
+          ansible_host: 192.168.1.170
+          vmid: 170
+          pve_node: node0
+        k3s-node1:
+          ansible_host: 192.168.1.171
+          vmid: 171
+          pve_node: node1
+    infra:
+      hosts:
+        nas:
+          ansible_host: 192.168.1.111
+          web_port: 5000
+          web_url: nas.jordanhome.dev
+        dns:
+          ansible_host: 192.168.1.5

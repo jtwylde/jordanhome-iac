@@ -1,0 +1,6 @@
+- name: Deploy Endpoint Resources
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', item) | from_yaml }}"
+  with_fileglob:
+    - "{{ kubernetes_resources }}/external_web_endpoints/*.yaml.j2"

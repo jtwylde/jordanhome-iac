@@ -1,0 +1,22 @@
+- name: Configure NAS Endpoint
+  hosts: localhost
+
+  vars_files:
+    - ../vault/vault.yaml
+
+  vars:
+    issuer: "letsencrypt"
+
+  environment: 
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
+
+  tasks:
+    - name: Configure NAS Web Endpoint
+      ansible.builtin.include_role:
+        name: external_web_endpoint
+      vars:
+        endpoint_name: "nas"
+        url: "{{ hostvars['nas'].web_url }}"
+        endpoint_ip: "{{ hostvars['nas'].ansible_host }}"
+        endpoint_port: "{{ hostvars['nas'].web_port }}"
+        issuer: "letsencrypt-staging"

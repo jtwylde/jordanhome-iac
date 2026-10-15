@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: "{{ endpoint_name }}-web"
+  namespace: default
+subsets:
+  - addresses:
+      - ip: {{ endpoint_ip }}
+    ports:
+      - name: http
+        port: {{ endpoint_port }}

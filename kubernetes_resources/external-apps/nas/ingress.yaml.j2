@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nas-web
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+  generation: 1
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: {{ hostvars['nas'].web_url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: nas-web
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - {{ hostvars['nas'].web_url }}
+    secretName: nas-web-cert

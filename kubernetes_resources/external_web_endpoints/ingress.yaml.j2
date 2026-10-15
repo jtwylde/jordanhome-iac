@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{ endpoint_name }}-web"
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+  generation: 1
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: {{ url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: "{{ endpoint_name }}-web"
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - {{ url }}
+    secretName: "{{ endpoint_name }}-web-cert"

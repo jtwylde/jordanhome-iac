@@ -1,0 +1,19 @@
+argument_specs:
+  main:
+    short_description: Configure external web endpoints
+    options:
+      endpoint_name:
+        type: str
+        required: true
+      url:
+        type: str
+        required: true
+      endpoint_ip:
+        type: str
+        required: true
+      endpoint_port:
+        type: str
+        required: true
+      issuer:
+        type: str
+        required: false
