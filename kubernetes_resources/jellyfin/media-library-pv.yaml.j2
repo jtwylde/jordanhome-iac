@@ -10,5 +10,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
   nfs:
-    server: {{ nas_ip }}
+    server: {{ hostvars['nas'].ansible_host }}
     path: /volume1/JordanNAS/media-library

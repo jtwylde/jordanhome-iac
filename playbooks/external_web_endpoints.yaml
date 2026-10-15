@@ -1,0 +1,22 @@
+- name: Configure External Web Endpoints
+  hosts: localhost
+
+  vars_files:
+    - ../vault/vault.yaml
+
+  vars:
+    issuer: "letsencrypt"
+
+  environment: 
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
+
+  tasks:
+    - name: Create external web endpoints
+      ansible.builtin.include_role:
+        name: external_web_endpoint
+      vars:
+        endpoint_name: "{{ item }}"
+        url: "{{ hostvars[item].web_url }}"
+        endpoint_ip: "{{ hostvars[item].ansible_host }}"
+        endpoint_port: "{{ hostvars[item].web_port }}"
+      loop: "{{ groups['external'] }}"

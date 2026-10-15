@@ -1,6 +1,12 @@
-- name: Deploy Endpoint Resources
+- name: Create {{ endpoint_name }} endpoint
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', item) | from_yaml }}"
-  with_fileglob:
-    - "{{ kubernetes_resources }}/external_web_endpoints/*.yaml.j2"
+    definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/endpoint.yaml.j2') | from_yaml }}"
+- name: Create {{ endpoint_name }} ingress
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/ingress.yaml.j2') | from_yaml }}"
+- name: Create {{ endpoint_name }} service
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/service.yaml.j2') | from_yaml }}"

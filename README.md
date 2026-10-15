@@ -51,6 +51,11 @@ Currently tailscale is installed seperately, this should be consolidated into a 
 Jellyfin is configured with one playbook which just adds all the k8s resources
 `./runplaybook playbooks/jellyfin.yaml`
 
+## External Web Apps
+
+External web apps (i.e web apps on the network, but not managed within the cluster) can be proxied through Traefik within the cluster. This let's us use the one VIP for everything. These are set in `inventory/group_vars/hosts` under `external`. Running the playbook will ensure all of these are created.
+`./runplaybook playbooks/external_web_endpoints.yaml`
+
 
 ## Secrets
 Below secrets are configured in `vault.yaml`. A `.vaultpw` file is needed in the root of the project containing the plaintext password used to encrypt the vault.
