@@ -5,7 +5,7 @@
     - ../vault/vault.yaml
 
   vars:
-    issuer: "letsencrypt"
+    issuer: "letsencrypt-staging"
     base_url: "homepage.{{ base_domain }}"
 
   environment: 
