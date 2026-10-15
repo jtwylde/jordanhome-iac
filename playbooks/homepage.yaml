@@ -5,8 +5,8 @@
     - ../vault/vault.yaml
 
   vars:
-    base_url: "k3s.jordanhome.dev"
-    issuer: "letsencrypt-staging"
+    issuer: "letsencrypt"
+    base_url: "homepage.{{ base_domain }}"
 
   environment: 
     K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"

@@ -15,12 +15,10 @@ all:
         nas:
           ansible_host: 192.168.1.111
           web_port: 5000
-          web_url: nas.jordanhome.dev
         dns:
           ansible_host: 192.168.1.5
           web_port: 80
-          web_url: pihole.jordanhome.dev
+          url_prefix: pihole
         octoprint:
           ansible_host: 192.168.1.5
           web_port: 5000
-          web_url: octoprint.jordanhome.dev

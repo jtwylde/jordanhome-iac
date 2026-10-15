@@ -15,5 +15,5 @@ kubeconfig_location: "{{ root_dir }}/.config/kubeconfig.yaml"
 kubernetes_resources: "{{ root_dir }}/kubernetes_resources"
 k3s_vip_address: 192.168.1.205
 
-# jellyfin
-config_backup_cron: "0 15 * * *"
+# Endpoints
+base_domain: "jordanhome.dev"

@@ -5,7 +5,8 @@
     - ../vault/vault.yaml
 
   vars:
-    base_url: "media.jordanhome.dev"
+    config_backup_cron: "0 15 * * *"
+    base_url: "media.{{ base_domain }}"
     issuer: "letsencrypt"
 
   environment: 

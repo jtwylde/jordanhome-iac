@@ -14,7 +14,7 @@ metadata:
     cert-manager.io/cluster-issuer: {{ issuer }}
 spec:
   rules:
-    - host: "homepage.k3s.jordanhome.dev"
+    - host: "{{ base_url }}"
       http:
         paths:
           - path: "/"
@@ -26,5 +26,5 @@ spec:
                   number: 3000
   tls:
   - hosts:
-    - homepage.k3s.jordanhome.dev
+    - "{{ base_url }}"
     secretName: homepage-web-cert

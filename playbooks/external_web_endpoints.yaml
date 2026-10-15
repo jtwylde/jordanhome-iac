@@ -16,7 +16,7 @@
         name: external_web_endpoint
       vars:
         endpoint_name: "{{ item }}"
-        url: "{{ hostvars[item].web_url }}"
+        url: "{{ hostvars[item].url_prefix | default(item) }}.{{ base_domain }}"
         endpoint_ip: "{{ hostvars[item].ansible_host }}"
         endpoint_port: "{{ hostvars[item].web_port }}"
       loop: "{{ groups['external'] }}"
