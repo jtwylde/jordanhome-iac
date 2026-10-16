@@ -17,3 +17,6 @@ argument_specs:
       issuer:
         type: str
         required: false
+      backend_https:
+        type: bool
+        required: false

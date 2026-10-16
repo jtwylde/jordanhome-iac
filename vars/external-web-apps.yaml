@@ -1,0 +1,17 @@
+webapps:
+  nas:
+    host: nas
+    web_port: 5000
+  pihole:
+    host: dns
+    web_port: 80
+  octoprint:
+    host: dns
+    web_port: 5000
+  amp:
+    host: nuc
+    web_port: 8080
+  portainer:
+    host: oldmgt
+    web_port: 9443
+    backend_https: true

@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: "{{ endpoint_name }}-web"
+  namespace: default
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`{{ url }}`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: "{{ endpoint_name }}-web"
+          port: 80
+          scheme: https
+          serversTransport: "{{ endpoint_name }}-web"
+  tls:
+    secretName: "{{ endpoint_name }}-web-cert"

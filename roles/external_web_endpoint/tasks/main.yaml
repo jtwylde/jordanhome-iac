@@ -1,12 +1,36 @@
+- name: log
+  ansible.builtin.debug:
+    msg: "{{ backend_https | default('aaa') }}"
+
 - name: Create {{ endpoint_name }} endpoint
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/endpoint.yaml.j2') | from_yaml }}"
-- name: Create {{ endpoint_name }} ingress
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/ingress.yaml.j2') | from_yaml }}"
 - name: Create {{ endpoint_name }} service
   kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/service.yaml.j2') | from_yaml }}"
+
+# if the backend listens on http we can use an ingress
+- name: Create {{ endpoint_name }} ingress
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/ingress.yaml.j2') | from_yaml }}"
+  when: not (backend_https | bool)
+
+# if the backend listens on https we need to create an ingressRoute stack instead
+- name: Configure ingress route stack
+  when: backend_https | bool
+  block: 
+  - name: Create {{ endpoint_name }} certificate
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/certificate.yaml.j2') | from_yaml }}"
+  - name: Create {{ endpoint_name }} serversTransport
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/serversTransport.yaml.j2') | from_yaml }}"
+  - name: Create {{ endpoint_name }} ingressRoute
+    kubernetes.core.k8s:
+      state: present
+      definition: "{{ lookup('template', kubernetes_resources ~ '/external_web_endpoints/ingressRoute.yaml.j2') | from_yaml }}"

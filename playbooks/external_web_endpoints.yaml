@@ -3,6 +3,7 @@
 
   vars_files:
     - ../vault/vault.yaml
+    - ../vars/external-web-apps.yaml
 
   vars:
     issuer: "letsencrypt"
@@ -15,8 +16,9 @@
       ansible.builtin.include_role:
         name: external_web_endpoint
       vars:
-        endpoint_name: "{{ item }}"
-        url: "{{ hostvars[item].url_prefix | default(item) }}.{{ base_domain }}"
-        endpoint_ip: "{{ hostvars[item].ansible_host }}"
-        endpoint_port: "{{ hostvars[item].web_port }}"
-      loop: "{{ groups['external'] }}"
+        endpoint_name: "{{ item.key }}"
+        url: "{{ item.value.url_prefix | default(item.key) }}.{{ base_domain }}"
+        endpoint_ip: "{{ hostvars[item.value.host].ansible_host }}"
+        endpoint_port: "{{ item.value.web_port }}"
+        backend_https: "{{ item.value.backend_https | default(false) }}"
+      loop: "{{ webapps | dict2items }}"

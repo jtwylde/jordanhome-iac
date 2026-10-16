@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ endpoint_name }}-web-cert"
+  namespace: default
+spec:
+  secretName: "{{ endpoint_name }}-web-cert"
+  issuerRef:
+    name: {{ issuer }}
+    kind: ClusterIssuer
+  dnsNames:
+    - {{ url }}
