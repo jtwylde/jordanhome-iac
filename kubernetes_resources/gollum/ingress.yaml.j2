@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: gollum
+  name: gollum
+  namespace: default
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: {{ base_url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: gollum
+            port:
+              name: http 
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - {{ base_url }}
+    secretName: gollum-web-cert
+status:
+  loadBalancer:
+    ingress:
+    - ip: 192.168.1.170
+    - ip: 192.168.1.171

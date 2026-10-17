@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gollum
+  namespace: default
+  labels:
+    app.kubernetes.io/name: gollum
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gollum
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: gollum
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: gollum-config
+        - name: github-token
+          secret:
+            secretName: github-wiki-secret
+            defaultMode: 0440
+        - name: ssh-config
+          configMap:
+            name: git-ssh-config
+            defaultMode: 0444
+        - name: knownhosts
+          configMap:
+            name: knownhosts-config
+            defaultMode: 0444
+      initContainers:
+        - name: clone-wiki
+          image: alpine/git
+          command:
+            - sh
+            - -ec
+            - |
+              if [ ! -d /wiki/.git ]; then
+                echo "Cloning wiki repository..."
+                GIT_SSH_COMMAND="ssh -i /ssh/github-token -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" git clone --branch main "$WIKI_GIT_URL" /wiki
+              else
+                echo "Wiki repository already exists; skipping clone."
+              fi
+          env:
+          - name: WIKI_GIT_URL
+            value: "git@github.com:jtwylde/jordanhome-wiki.git"
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          volumeMounts:
+            - name: config
+              mountPath: /wiki
+            - name: github-token
+              mountPath: /ssh/github-token
+              subPath: github-token
+              readOnly: true
+            - name: ssh-config
+              mountPath: /root/.ssh/config
+              subPath: config
+              readOnly: true
+            - name: knownhosts
+              mountPath: /root/.ssh/known_hosts
+              subPath: known_hosts
+              readOnly: true
+      containers:
+        - name: gollum
+          image: "gollumwiki/gollum:6.1.0"
+          args:
+            - "--config /wiki/config.rb"
+            - "--page_file_dir content/"
+          volumeMounts:
+            - name: config
+              mountPath: /wiki
+            - name: github-token
+              mountPath: /home/www-data/.ssh/github-token
+              subPath: github-token
+              readOnly: true
+            - name: ssh-config
+              mountPath: /home/www-data/.ssh/config
+              subPath: config
+              readOnly: true
+            - name: knownhosts
+              mountPath: /home/www-data/.ssh/known_hosts
+              subPath: known_hosts
+              readOnly: true
+          ports:
+            - name: http
+              containerPort: 4567
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
