@@ -14,7 +14,7 @@
   tasks:
   - name: Deploy Homepage
     kubernetes.core.k8s:
-      state: present
+      state: absent
       definition: "{{ lookup('template', item) | from_yaml }}"
     with_fileglob:
       - "{{ kubernetes_resources }}/homepage/*.yaml.j2"
