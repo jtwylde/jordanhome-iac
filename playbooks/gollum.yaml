@@ -14,7 +14,7 @@
   tasks:
   - name: Deploy Gollum
     kubernetes.core.k8s:
-      state: absent
+      state: present
       definition: "{{ lookup('template', item) | from_yaml }}"
     with_fileglob:
       - "{{ kubernetes_resources }}/gollum/*.yaml.j2"

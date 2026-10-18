@@ -50,7 +50,6 @@ spec:
           image: "gollumwiki/gollum:6.1.0"
           args:
             - "--config /wiki/config.rb"
-            - "--page_file_dir content/"
           volumeMounts:
             - name: config
               mountPath: /wiki
