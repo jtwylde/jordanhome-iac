@@ -1,4 +1,4 @@
-- name: Setup Jellyfin
+- name: Setup Gollum
   hosts: localhost
 
   vars_files:

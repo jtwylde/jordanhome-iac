@@ -3,10 +3,14 @@ Some basic overview of the structure of the playbooks and how they're used in my
 
 ## Setup
 1. Activate python venv
+    1. `python3 -m venv venv`
+    2. `source venv/bin/activate`
 
 2. Install requirements
 `pip3 install -r requirements.txt`
 `ansible-galaxy install -r ansible-galaxy-requirements.yaml`
+
+3. Copy the vault password from Bitwarden into `.vaultpw`
 
 ## Utility Scripts
 `./runplaybook <playbook.yaml>` 
