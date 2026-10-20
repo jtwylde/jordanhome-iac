@@ -78,11 +78,19 @@ spec:
             - mountPath: /app/config/widgets.yaml
               name: homepage-config
               subPath: widgets.yaml
+            - mountPath: /app/config/proxmox.yaml
+              name: homepage-config
+              subPath: proxmox.yaml
+            - mountPath: /app/public/images
+              name: homepage-assets
             - mountPath: /app/config/logs
               name: logs
       volumes:
         - name: homepage-config
           configMap:
             name: homepage
+        - name: homepage-assets
+          persistentVolumeClaim:
+            claimName: homepage-assets-pvc
         - name: logs
           emptyDir: {}
