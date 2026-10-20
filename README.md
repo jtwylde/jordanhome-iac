@@ -16,6 +16,9 @@ Some basic overview of the structure of the playbooks and how they're used in my
 `./runplaybook <playbook.yaml>` 
 Runs the given playbook with correct args and flags
 
+Most app playbooks should support an optional variable for the app state. This allows for quickly swapping between absent and present. Default is 'present'
+`./runplaybook <playbook.yaml> -e "state=<state>"`
+
 `./reprovision.sh`
 Runs the deprovisioning and provisioning playbooks to quickly spin the VMs back up
 

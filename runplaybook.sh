@@ -1,1 +1,4 @@
-ansible-playbook $1 --vault-password-file .vaultpw
+playbook=$1
+shift
+
+ansible-playbook $playbook --vault-password-file .vaultpw $@

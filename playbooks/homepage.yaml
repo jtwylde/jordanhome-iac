@@ -1,4 +1,4 @@
-- name: Setup Jellyfin
+- name: Setup Homepage
   hosts: localhost
 
   vars_files:
@@ -7,6 +7,7 @@
   vars:
     issuer: "letsencrypt-staging"
     base_url: "homepage.{{ base_domain }}"
+    state: present
 
   environment: 
     K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
@@ -14,7 +15,7 @@
   tasks:
   - name: Deploy Homepage
     kubernetes.core.k8s:
-      state: absent
+      state: "{{ state }}"
       definition: "{{ lookup('template', item) | from_yaml }}"
     with_fileglob:
       - "{{ kubernetes_resources }}/homepage/*.yaml.j2"
