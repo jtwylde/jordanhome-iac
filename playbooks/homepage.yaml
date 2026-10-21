@@ -5,7 +5,7 @@
     - ../vault/homepagesecrets.yaml
 
   vars:
-    issuer: "letsencrypt-staging"
+    issuer: "letsencrypt"
     base_url: "homepage.{{ base_domain }}"
     state: present
 
@@ -13,6 +13,10 @@
     K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
 
   tasks:
+  - name: Deploy Homepage Namespace
+    kubernetes.core.k8s:
+      state: "{{ state }}"
+      definition: "{{ lookup('template', kubernetes_resources ~ '/homepage/namespace.yaml.j2') | from_yaml }}"
   - name: Deploy Homepage Assets PV
     kubernetes.core.k8s:
       state: "{{ state }}"
