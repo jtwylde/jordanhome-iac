@@ -5,8 +5,8 @@
     - ../vault/vault.yaml
 
   vars:
-    base_url: "dashy.{{ base_domain }}"
-    issuer: "letsencrypt-staging"
+    base_url: "{{ base_domain }}"
+    issuer: "letsencrypt"
     state: present
 
   environment: 

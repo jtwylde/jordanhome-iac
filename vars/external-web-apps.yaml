@@ -11,6 +11,14 @@ webapps:
   amp:
     host: nuc
     web_port: 8080
+  pve1:
+    host: pve1
+    web_port: 8006
+    backend_https: true
+  pve2:
+    host: pve2
+    web_port: 8006
+    backend_https: true
   portainer:
     host: oldmgt
     web_port: 9443

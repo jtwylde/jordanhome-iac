@@ -8,7 +8,7 @@ image:
   repository: lissy93/dashy
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "release-3.1.1"
+  tag: "latest"
 
 # Choose deployment strategy type
 strategyType: Recreate
@@ -122,46 +122,131 @@ static:
     conf: |-
       # Page meta info, like heading, footer text and nav links
       pageInfo:
-        title: Dashy
-        description: Welcome to your new dashboard!
-        navLinks:
-          - title: GitHub
-            path: https://github.com/Lissy93/dashy
-          - title: Documentation
-            path: https://dashy.to/docs
-  
+        title: Jordan's Dashboard
+
       # Optional app settings and configuration
       appConfig:
-        theme: colorful
-  
+        theme: one-dark
+        statusCheck: true
+
       # Main content - An array of sections, each containing an array of items
       sections:
-        - name: Getting Started
+        - name: Webapps
           icon: fas fa-rocket
           items:
-            - title: Dashy Live
-              description: Development a project management links for Dashy
-              icon: https://i.ibb.co/qWWpD0v/astro-dab-128.png
-              url: https://live.dashy.to/
-              target: newtab
-            - title: GitHub
-              description: Source Code, Issues and Pull Requests
-              url: https://github.com/lissy93/dashy
-              icon: favicon
-            - title: Docs
-              description: Configuring & Usage Documentation
-              provider: Dashy.to
-              icon: far fa-book
-              url: https://dashy.to/docs
-            - title: Showcase
-              description: See how others are using Dashy
-              url: https://github.com/Lissy93/dashy/blob/master/docs/showcase.md
-              icon: far fa-grin-hearts
-            - title: Config Guide
-              description: See full list of configuration options
-              url: https://github.com/Lissy93/dashy/blob/master/docs/configuring.md
-              icon: fas fa-wrench
-            - title: Support
-              description: Get help with Dashy, raise a bug, or get in contact
-              url: https://github.com/Lissy93/dashy/blob/master/.github/SUPPORT.md
-              icon: far fa-hands-helping
+            - title: Wiki
+              description: Homelab Wiki
+              icon: sh-wiki-go
+              url: https://wiki.jordanhome.dev
+            - title: Octoprint
+              description: 3D Printing
+              icon: sh-octoprint
+              url: https://octoprint.jordanhome.dev
+            - title: Headlamp
+              description: Kubernetes Monitoring
+              icon: sh-headlamp
+              url: https://headlamp.jordanhome.dev
+            - title: AMP
+              description: Game Server
+              icon: sh-cubecoders-amp
+              url: https://amp.jordanhome.dev
+            - title: Romm
+              description: ROM Library
+              icon: sh-romm
+              url: https://romm.jordanhome.dev
+        - name: Media
+          icon: fas fa-compact-disc
+          items:
+            - title: Jellyfin
+              description: Media Server
+              icon: sh-jellyfin
+              url: https://media.jordanhome.dev
+            - title: Sonarr
+              description: Series Grabber
+              icon: sh-sonarr
+              url: https://sonarr.media.jordanhome.dev
+            - title: Radarr
+              description: Movie Grabber
+              icon: sh-radarr
+              url: https://radarr.media.jordanhome.dev
+            - title: Prowlarr
+              description: Torrent Indexer
+              icon: sh-prowlarr
+              url: https://prowlarr.media.jordanhome.dev
+            - title: Bazarr
+              description: Subtitle Grabber
+              icon: sh-bazarr
+              url: https://bazarr.media.jordanhome.dev
+            - title: Qbittorrent
+              description: Torrent Server
+              icon: sh-qbittorrent
+              url: https://qbit.media.jordanhome.dev
+            - title: Jellyseerr
+              description: Media Requests
+              icon: sh-jellyseerr
+              url: https://request.media.jordanhome.dev
+
+
+        - name: Hacker News
+          icon: fas fa-code-branch
+          displayData:
+            cols: 1
+            rows: 3
+            cutToHeight: true
+          widgets:
+            - type: rss-feed
+              useProxy: true
+              options:
+                rssUrl: https://news.ycombinator.com/rss
+                parseLocally: true
+                limit: 5
+
+        - name: Infrastructure
+          icon: fas fa-compact-disc
+          widgets:
+            - type: proxmox-lists
+              useProxy: true 
+              options:
+                cluster_url: https://pve1.jordanhome.dev
+                user_name: root@pam
+                token_name: dashy
+                token_uuid: {{ dashy_pve_api_key }}
+                node: node0
+                node_data: qemu
+                title: Node-0 VMs
+                title_as_link: true
+                hide_templates: 1
+            - type: proxmox-lists
+              useProxy: true 
+              options:
+                cluster_url: https://pve2.jordanhome.dev
+                user_name: root@pam
+                token_name: dashy
+                token_uuid: {{ dashy_pve_api_key }}
+                node: node1
+                node_data: qemu
+                title: Node-1 VMs
+                title_as_link: true
+                hide_templates: 1
+          items:
+            - title: DNS
+              description: DNS
+              icon: sh-raspberry-pi
+              url: https://pihole.jordanhome.dev/admin
+            - title: NAS
+              description: NAS Storage
+              icon: sh-synology
+              url: https://nas.jordanhome.dev
+            - title: Proxmox
+              description: Hypervisors
+              icon: sh-proxmox
+              url: https://192.168.1.160:8006
+
+        - name: Do it for him
+          icon: fas fa-heart
+          displayData:
+            itemSize: large
+          widgets:
+            - type: image
+              options:
+                imagePath: https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/c1d5f872-9b64-4c7c-bbef-b236ac75aa3c/dfpd079-813f8431-2fe9-4008-a012-bc8d1a769a4b.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi9jMWQ1Zjg3Mi05YjY0LTRjN2MtYmJlZi1iMjM2YWM3NWFhM2MvZGZwZDA3OS04MTNmODQzMS0yZmU5LTQwMDgtYTAxMi1iYzhkMWE3NjlhNGIuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.ZfzBaOcrhmyI5VErIQM2M_hYIjc9zUlhDQsdziRJe9U
