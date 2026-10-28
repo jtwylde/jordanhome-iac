@@ -1,0 +1,20 @@
+- name: Add repo
+  kubernetes.core.helm_repository:
+    name: "{{ repo_name }}"
+    repo_url: "{{ repo_url }}"
+    repo_state: "{{ state }}"
+
+- name: Clone helm template
+  ansible.builtin.template:
+    src: "{{ kubernetes_resources }}/{{ app }}/helm.yaml.j2"
+    dest: "{{ root_dir }}/.tmp/{{ app }}helm.yaml"
+
+- name: Deploy App
+  kubernetes.core.helm:
+    name: "{{ app }}"
+    chart_ref: "{{ chart_ref }}"
+    release_namespace: "{{ deployment_namespace }}"
+    create_namespace: true
+    release_state: "{{ state }}"
+    wait: true
+    values_files: "{{ root_dir }}/.tmp/{{ app }}helm.yaml"

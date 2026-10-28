@@ -1,4 +1,6 @@
-- name: Apply Kubernetes resource from template
+- name: Deploy {{ app }} resources
   kubernetes.core.k8s:
     state: "{{ state }}"
-    definition: "{{ lookup('template', kubernetes_resources ~ '/' ~ app ~ '/*.yaml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', item) | from_yaml }}"
+  with_fileglob:
+    - "{{ kubernetes_resources }}/{{ app }}/*.yaml.j2"

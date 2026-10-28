@@ -1,0 +1,28 @@
+- name: Setup romm
+  hosts: localhost
+
+  vars_files:
+    - ../vault/vault.yaml
+
+  vars:
+    base_url: "romm.{{ base_domain }}"
+    issuer: "letsencrypt-staging"
+    state: absent
+
+  environment: 
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
+
+  tasks:
+  # Ensure namespace is created first
+  - name: Create romm namespace
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-j2-template.yaml
+    vars:
+      app: romm
+      resource: namespace
+
+  - name: Deploy Romm
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-j2-templates-dir.yaml

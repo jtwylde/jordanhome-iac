@@ -8,32 +8,25 @@
     base_url: "headlamp.{{ base_domain }}"
     issuer: "letsencrypt"
     state: present
+    app: headlamp
 
   environment: 
     K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
 
   tasks:
-  - name: Add headlamp repo
-    kubernetes.core.helm_repository:
-      name: headlamp
+  - name: Deploy Headlamp
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-helm.yaml
+    vars:
+      repo_name: headlamp
       repo_url: https://kubernetes-sigs.github.io/headlamp/
-
-  - name: Clone Headlamp helm template
-    ansible.builtin.template:
-      src: "{{ kubernetes_resources }}/headlamp/helm.yaml.j2"
-      dest: "{{ root_dir }}/.tmp/headlamphelm.yaml"
-
-  - name: Deploy headlamp
-    kubernetes.core.helm:
-      name: headlamp
       chart_ref: headlamp/headlamp
-      release_namespace: kube-system
-      create_namespace: true
-      release_state: "{{ state }}"
-      wait: true
-      values_files: "{{ root_dir }}/.tmp/headlamphelm.yaml"
+      deployment_namespace: kube-system
 
-  - name: Create headlamp ingress
-    kubernetes.core.k8s:
-      state: "{{ state }}"
-      definition: "{{ lookup('template', kubernetes_resources ~ '/headlamp/ingress.yaml.j2') | from_yaml }}"
+  - name: Create Headlamp ingress
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-j2-template.yaml
+    vars:
+      resource: ingress

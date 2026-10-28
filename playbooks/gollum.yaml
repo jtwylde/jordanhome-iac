@@ -8,19 +8,21 @@
     issuer: "letsencrypt"
     base_url: "wiki.{{ base_domain }}"
     state: present
+    app: gollum
 
   environment: 
     K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
 
   tasks:
+  # Ensure namespace is created first
   - name: Create Gollum namespace
-    kubernetes.core.k8s:
-      state: "{{ state }}"
-      definition: "{{ lookup('template', kubernetes_resources ~ '/gollum/namespace.yaml.j2') | from_yaml }}"
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-j2-template.yaml
+    vars:
+      resource: namespace
 
   - name: Deploy Gollum
-    kubernetes.core.k8s:
-      state: "{{ state }}"
-      definition: "{{ lookup('template', item) | from_yaml }}"
-    with_fileglob:
-      - "{{ kubernetes_resources }}/gollum/*.yaml.j2"
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-j2-templates-dir.yaml

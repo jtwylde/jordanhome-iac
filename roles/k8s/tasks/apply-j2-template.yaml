@@ -1,4 +1,4 @@
-- name: Apply Kubernetes resource from template
+- name: Apply {{ app }} {{ resource }}
   kubernetes.core.k8s:
     state: "{{ state }}"
     definition: "{{ lookup('template', kubernetes_resources ~ '/' ~ app ~ '/' ~ resource ~ '.yaml.j2') | from_yaml }}"

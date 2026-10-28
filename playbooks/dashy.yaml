@@ -8,27 +8,18 @@
     base_url: "{{ base_domain }}"
     issuer: "letsencrypt"
     state: present
+    app: dashy
 
   environment: 
     K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
 
   tasks:
-  - name: Add dashy repo
-    kubernetes.core.helm_repository:
-      name: selfhosted-helmcharts
+  - name: Deploy Dashy
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-helm.yaml
+    vars:
+      repo_name: selfhosted-helmcharts
       repo_url: https://vyrtualsynthese.github.io/selfhosted-helmcharts/
-
-  - name: Clone dashy helm template
-    ansible.builtin.template:
-      src: "{{ kubernetes_resources }}/dashy/helm.yaml.j2"
-      dest: "{{ root_dir }}/.tmp/dashyhelm.yaml"
-
-  - name: Deploy dashy
-    kubernetes.core.helm:
-      name: dashy
       chart_ref: selfhosted-helmcharts/dashy
-      release_namespace: dashy
-      create_namespace: true
-      release_state: "{{ state }}"
-      wait: true
-      values_files: "{{ root_dir }}/.tmp/dashyhelm.yaml"
+      deployment_namespace: dashy
