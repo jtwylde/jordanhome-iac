@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: romm
+  name: romm
+  namespace: romm
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: {{ base_url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: romm
+            port:
+              name: http 
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - {{ base_url }}
+    secretName: romm-web-cert

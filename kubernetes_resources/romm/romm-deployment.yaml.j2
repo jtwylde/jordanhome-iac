@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm
+  namespace: romm
+  labels:
+    app.kubernetes.io/name: romm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: romm
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: romm
+    spec:
+      enableServiceLinks: false
+      volumes:
+        - name: romm-resources
+          persistentVolumeClaim:
+            claimName: romm-resources
+        - name: romm-redis-data
+          persistentVolumeClaim:
+            claimName: romm-redis-data
+        - name: romm-library
+          persistentVolumeClaim:
+            claimName: romm-library
+        - name: romm-assets
+          persistentVolumeClaim:
+            claimName: romm-assets
+        - name: romm-config
+          persistentVolumeClaim:
+            claimName: romm-config
+      containers:
+        - name: romm
+          image: "rommapp/romm:latest"
+          volumeMounts:
+            - name: romm-resources
+              mountPath: /romm/resources
+            - name: romm-redis-data
+              mountPath: /redis-data
+            - name: romm-library
+              mountPath: /romm/library
+            - name: romm-assets
+              mountPath: /romm/assets
+            - name: romm-config
+              mountPath: /romm/config
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: DB_HOST
+              value: "romm-db"
+            - name: DB_NAME
+              value: "romm"
+            - name: DB_USER
+              value: "romm"
+            - name: DB_PASSWD
+              value: "{{ romm_db_user }}"
+            - name: ROMM_AUTH_SECRET_KEY
+              value: "{{ romm_auth_secret }}"
+            - name: IGDB_CLIENT_ID
+              value: "{{ romm_igdb_client_id }}"
+            - name: IGDB_CLIENT_SECRET
+              value: "{{ romm_igdb_client_secret }}"
+            - name: HASHEOUS_API_ENABLED
+              value: "true"
+            - name: STEAMGRIDDB_API_KEY
+              value: "{{ romm_steamgrid_api }}"

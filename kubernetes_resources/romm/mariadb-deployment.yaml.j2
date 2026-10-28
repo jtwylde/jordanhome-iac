@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm-db
+  namespace: romm
+  labels:
+    app.kubernetes.io/name: romm-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: romm-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: romm-db
+    spec:
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mariadb-data
+      containers:
+        - name: romm-db
+          image: "mariadb:latest"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+          ports:
+            - name: http
+              containerPort: 3306
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: MARIADB_ROOT_PASSWORD
+              value: "{{ romm_db_root }}"
+            - name: MARIADB_DATABASE
+              value: "romm"
+            - name: MARIADB_USER
+              value: "romm"
+            - name: MARIADB_PASSWORD
+              value: "{{ romm_db_user }}"
