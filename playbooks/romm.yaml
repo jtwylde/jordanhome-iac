@@ -6,7 +6,7 @@
 
   vars:
     base_url: "romm.{{ base_domain }}"
-    issuer: "letsencrypt-staging"
+    issuer: "letsencrypt"
     state: present
     app: romm
 
