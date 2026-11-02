@@ -1,0 +1,123 @@
+image:
+  registry: ghcr.io
+  repository: seerr-team/seerr
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ''
+  sha: ''
+
+imagePullSecrets: []
+nameOverride: ''
+fullnameOverride: 'seerr'
+
+# Liveness / Readiness / Startup Probes
+probes:
+  # -- Configure liveness probe
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 15
+    timeoutSeconds: 3
+    # successThreshold: 1
+    # failureThreshold: 3
+  # -- Configure readiness probe
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 15
+    timeoutSeconds: 3
+    # successThreshold: 1
+    # failureThreshold: 3
+  # -- Configure startup probe
+  startupProbe: null
+  #  tcpSocket:
+  #    port: http
+
+# -- Environment variables to add to the seerr pods
+extraEnv: []
+# -- Environment variables from secrets or configmaps to add to the seerr pods
+extraEnvFrom: []
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # -- If not set and create is true, a name is generated using the fullname template
+  name: ''
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  privileged: false
+  runAsUser: 1000
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Set a DNS policy, likely not needed unless seerr only interacts with external services.
+# -- docs: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+dnsPolicy: ''
+
+# -- Set DNS config options
+# -- Setting ndots lower can prevent queries like `raw.githubusercontent.com.seerr.svc.cluster.local.`
+# -- docs: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config
+dnsConfig: {}
+# nameservers:
+#   - 1.2.3.4
+# searches:
+#   - ns1.svc.cluster-domain.example
+#   - my.dns.search.suffix
+# options:
+#   - name: ndots
+#     value: "2"
+
+# -- Set to false to run in an idmaped user namespace for additional isolation
+# -- requires cluster support, and PV support of idmaped volumes.
+# -- docs: https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/
+hostUsers: true
+
+# -- Specify a priorityclass, or use default if unset.
+priorityClassName: null
+
+service:
+  type: ClusterIP
+  port: 80
+  annotations: {}
+
+config:
+  persistence:
+    size: 5Gi
+    annotations: {}
+    accessModes:
+      - ReadWriteOnce
+    name: 'config'
+    volumeName: 'config'
+    # -- Specify an existing `PersistentVolumeClaim` to use. If this value is provided, the default PVC will not be created
+    existingClaim: 'seerr-config'
+ingress:
+  enabled: true
+  className: 'traefik'
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+  tls:
+  - hosts:
+      - request.{{ base_url }}
+    secretName: seerr-web-cert
+  hosts:
+    - host: request.{{ base_url }}
+      paths:
+        - path: /
+          pathType: Prefix

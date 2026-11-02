@@ -72,9 +72,22 @@
     vars:
       app: qbittorrent
 
-  - name: Deploy Jellyseerr
+  - name: Deploy Seerr resources
     ansible.builtin.include_role:
       name: k8s
-      tasks_from: apply-j2-templates-dir.yaml
+      tasks_from: apply-j2-templates-list.yaml
     vars:
-      app: jellyseerr
+      app: seerr
+      resources: 
+        - pvc
+        - backup-cronjob
+
+  - name: Deploy Seerr
+    ansible.builtin.include_role:
+      name: k8s
+      tasks_from: apply-helm.yaml
+    vars:
+      app: seerr
+      chart_ref: oci://ghcr.io/seerr-team/seerr/seerr-chart
+      deployment_namespace: jellyfin
+      use_oci: true

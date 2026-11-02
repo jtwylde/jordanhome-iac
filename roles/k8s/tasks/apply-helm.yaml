@@ -1,4 +1,5 @@
-- name: Add repo
+- name: Add {{ app }} helm repo
+  when: not (use_oci | default(false) | bool)
   kubernetes.core.helm_repository:
     name: "{{ repo_name }}"
     repo_url: "{{ repo_url }}"
@@ -9,7 +10,7 @@
     src: "{{ kubernetes_resources }}/{{ app }}/helm.yaml.j2"
     dest: "{{ root_dir }}/.tmp/{{ app }}helm.yaml"
 
-- name: Deploy App
+- name: Deploy {{ app }} helm chart
   kubernetes.core.helm:
     name: "{{ app }}"
     chart_ref: "{{ chart_ref }}"
