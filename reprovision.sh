@@ -1,1 +1,1 @@
-./runplaybook.sh playbooks/deprovision.yaml && ./runplaybook.sh playbooks/provision.yaml
+./runplaybook.sh playbooks/infra/deprovision.yaml && ./runplaybook.sh playbooks/infra/provision.yaml
