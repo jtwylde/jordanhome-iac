@@ -1,0 +1,36 @@
+- name: Configure jordanweb
+  hosts: jordanweb
+
+  vars:
+    base_url: "{{ base_domain }}"
+    state: present
+
+  tasks:
+    - name: Install webserver deps
+      become: true
+      ansible.builtin.apt:
+        state: present
+        pkg:
+        - git
+        - apache2 
+        - php 
+        - libapache2-mod-php 
+        - mariadb-server 
+        - mariadb-client
+        - python3-pymysql
+
+    - name: Configure Wordpress database
+      become: true
+      ansible.mariadb.mariadb_db:
+        name: wordpressdb
+        state: present
+        login_unix_socket: /run/mysqld/mysqld.sock
+
+    - name: Configure Wordpress database user
+      become: true
+      ansible.mariadb.mariadb_user:
+        name: wordpress_user
+        password: "{{ jordanweb_wordpressdb }}" 
+        priv: 'wordpressdb.*:ALL'
+        state: present
+        login_unix_socket: /run/mysqld/mysqld.sock
