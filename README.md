@@ -17,7 +17,9 @@ Some basic overview of the structure of the playbooks and how they're used in my
 Runs the given playbook with correct args and flags
 
 Most app playbooks should support an optional variable for the app state. This allows for quickly swapping between absent and present. Default is 'present'
-`./runplaybook <playbook.yaml> -e "state=<state>"`
+`./runplaybook <playbook.yaml> --absent`
+
+Other flags to the `ansible-playbook` command can be passed through freely
 
 `./reprovision.sh`
 Runs the deprovisioning and provisioning playbooks to quickly spin the VMs back up
@@ -29,39 +31,35 @@ Run provision to provision all VMs. Does the following:
 * Configures networking
 * Sets hostname
 
-`./runplaybook playbooks/provision.yaml`
+`./runplaybook playbooks/infra/provision.yaml`
 
 Run deprovision to deprovision all VMs. Does the following:
 * Removes stale SSH keys
 * Stops each VM
 * Removes each VM
-`./runplaybook playbooks/deprovision.yaml`
+`./runplaybook playbooks/infra/deprovision.yaml`
 
 
 ## K3S
 
 The master node defaults to the first node in the hosts list for k3s_nodes
 Running the playbook will bootstrap the master node and then join the other nodes into it to form the cluster
-`./runplaybook playbooks/install_3s.yaml`
-
-These two playbooks are seperated because one needs actual k8s operations are done on localhost
-`./runplaybook playbooks/configure_k3s_defaults.yaml`
-
+`./runplaybook playbooks/infra/install_3s.yaml`
 
 ## Tailscale
 
 Currently tailscale is installed seperately, this should be consolidated into a provisioning playbook later on
-`./runplaybook playbooks/tailscale.yaml`
+`./runplaybook playbooks/apps/tailscale.yaml`
 
 ## Jellyfin
 
 Jellyfin is configured with one playbook which just adds all the k8s resources
-`./runplaybook playbooks/jellyfin.yaml`
+`./runplaybook playbooks/apps/jellyfin.yaml`
 
 ## External Web Apps
 
 External web apps (i.e web apps on the network, but not managed within the cluster) can be proxied through Traefik within the cluster. This let's us use the one VIP for everything. These are set in `inventory/group_vars/hosts` under `external`. Running the playbook will ensure all of these are created.
-`./runplaybook playbooks/external_web_endpoints.yaml`
+`./runplaybook playbooks/apps/external_web_endpoints.yaml`
 
 
 ## Secrets
@@ -81,3 +79,27 @@ The API token for cloudflare, used for DNS ACME challenges
 
 ### tailscale_auth_key
 API key for tailscale, used for automatically registering with the tailscale network
+
+### github_wiki
+The HTTPS API Token for Gollum to clone/push to the wiki repo
+
+### dashy_pve_api_key
+The API key for Dashy to monitor the PVE cluster
+
+### romm_auth_secret
+Master secret for Romm
+
+### romm_igdb_client_id
+Client ID for IGDB API, used in Romm
+
+### romm_igdb_client_secret
+Client secret for IGDB API, used in Romm
+
+### romm_steamgrid_api
+API Token for the SteamgridDB API, used in Romm
+
+### romm_db_root
+Romm database root user password
+
+### romm_db_user
+Romm database servie user password
