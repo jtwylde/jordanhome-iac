@@ -7,8 +7,9 @@ all:
             jordanweb:
               ansible_host: 192.168.1.185
               vmid: 185
-              pve_node: node0
-              mem: 4
+              pve_node: node1
+              mem: 4096
+              cores: 2
         k3s_nodes:
           hosts:
             k3s-node0:
