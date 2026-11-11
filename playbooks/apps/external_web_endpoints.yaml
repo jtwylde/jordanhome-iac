@@ -2,7 +2,6 @@
   hosts: localhost
 
   vars_files:
-    - ../vault/vault.yaml
     - ../vars/external-web-apps.yaml
 
   vars:

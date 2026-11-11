@@ -1,0 +1,134 @@
+- name: Install k3s servers
+  hosts: k3s_nodes
+  become: true
+  tasks:
+    - name: Bootstrap master k3s nodes
+      ansible.builtin.shell:
+        cmd: >
+          curl -sfL https://get.k3s.io |
+          sh -s - server --cluster-init --tls-san={{ k3s_vip_address }}
+        creates: /usr/local/bin/k3s
+      when: ansible_host == k3s_master_node
+
+    - name: Wait for master node to initialize
+      become: false
+      delegate_to: localhost
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: 6443
+        delay: 5
+        timeout: 300
+      when: ansible_host == k3s_master_node
+
+    - name: Read cluster token from master node
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      delegate_to: "{{ k3s_master_node }}"
+      run_once: true
+      register: k3s_token_raw
+
+    - name: Set cluster token
+      ansible.builtin.set_fact:
+        k3s_token: "{{ k3s_token_raw.content | b64decode | trim }}"
+
+    - name: Install k3s nodes
+      ansible.builtin.shell:
+        cmd: >
+          curl -sfL https://get.k3s.io |
+          K3S_URL=https://{{ k3s_master_node }}:6443
+          K3S_TOKEN={{ k3s_token }}
+          sh -s - server
+        creates: /usr/local/bin/k3s
+      when: ansible_host != k3s_master_node
+
+    - name: Create kubeconfig dir
+      ansible.builtin.file:
+        path: /root/.kube/
+        state: directory
+        mode: '0755'
+
+    - name: Symlink the kubeconfig
+      ansible.builtin.file:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /root/.kube/config
+        state: link
+
+    - name: Fetch k3s kubeconfig
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ kubeconfig_location }}"
+        flat: true
+      when: ansible_host == k3s_master_node
+
+    - name: Fix local kubeconfig
+      become: false
+      ansible.builtin.replace:
+        path: "{{ kubeconfig_location }}"
+        regexp: 'https://127\.0\.0\.1:6443'
+        replace: 'https://{{ k3s_master_node }}:6443'
+      delegate_to: localhost
+
+    - name: Install NFS client
+      ansible.builtin.apt:
+        name: nfs-common
+        state: present
+        update_cache: true
+
+- name: Configure k3s cluster & defaults
+  hosts: localhost
+
+  environment: 
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
+
+  tasks:
+    - name: Deploy latest version of cert-manager
+      kubernetes.core.helm:
+        name: cert-manager
+        chart_ref: oci://quay.io/jetstack/charts/cert-manager
+        chart_version: v1.20.3
+        release_namespace: cert-manager
+        create_namespace: true
+        release_state: present
+        values:
+          crds:
+            enabled: true
+        wait: true
+
+    # create cluster issuer
+    - name: Deploy cloudflare token
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: cloudflare-api-token-secret
+            namespace: cert-manager
+          type: Opaque
+          stringData:
+            api-token: "{{ cloudflare_api_token }}"
+
+    - name: Deploy LE Cluster Issuer
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ kubernetes_resources }}/cert-manager/le-clusterissuer.yaml"
+
+    - name: Deploy LE Staging Cluster Issuer
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ kubernetes_resources }}/cert-manager/le-staging-clusterissuer.yaml"
+
+    - name: Setup kube-vip RBAC
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ kubernetes_resources ~ '/kube-vip/rbac.yaml' }}"
+
+    - name: Deploy kube-vip
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', kubernetes_resources ~ '/kube-vip/deployment.yaml.j2') | from_yaml }}"
+
+    - name: Setup config backup NFS PV
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('template', kubernetes_resources ~ '/common/config-backups-pv.yaml.j2') | from_yaml }}"

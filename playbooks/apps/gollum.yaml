@@ -1,0 +1,25 @@
+- name: Setup Gollum
+  hosts: localhost
+
+  vars:
+    issuer: "letsencrypt"
+    base_url: "wiki.{{ base_domain }}"
+    state: present
+    app: gollum
+
+  environment: 
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
+
+  tasks:
+    # Ensure namespace is created first
+    - name: Create Gollum namespace
+      ansible.builtin.include_role:
+        name: k8s
+        tasks_from: apply-j2-template.yaml
+      vars:
+        resource: namespace
+
+    - name: Deploy Gollum
+      ansible.builtin.include_role:
+        name: k8s
+        tasks_from: apply-j2-templates-dir.yaml

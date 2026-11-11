@@ -1,13 +1,11 @@
 - name: Deprovision VMs
-  hosts: all
+  hosts: vms
   gather_facts: false
   ignore_errors: true
 
-  vars_files:
-    - ../vault/vault.yaml
   vars_prompt:
     - name: "confirmation"
-      prompt: "This playbook will destroy all VMs in the clutser. Are you sure you want to run this playbook? (Type 'YES' to continue)"
+      prompt: "This playbook will destroy all VMs in the cluster. Are you sure you want to run this playbook? (Type 'YES' to continue)"
       default: "NO"
       private: false
 

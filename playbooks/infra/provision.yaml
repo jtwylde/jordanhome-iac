@@ -1,14 +1,11 @@
 - name: Provision VMs
-  hosts: all
+  hosts: vms
   gather_facts: false
 
   vars:
     template_vmid:
       node0: 9000
       node1: 9001
-
-  vars_files:
-    - ../vault/vault.yaml
 
   tasks:
     - name: Clone template
