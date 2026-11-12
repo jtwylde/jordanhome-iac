@@ -57,3 +57,10 @@
       ansible.builtin.template:
         src: "{{ root_dir ~ '/templates/wordpress-config.php.j2' }}"
         dest: /var/www/html/wp-config.php
+
+    - name: Add URL to hosts file
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.0\.1'
+        line: 127.0.0.1 localhost {{ base_url }}
