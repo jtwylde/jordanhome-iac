@@ -2,14 +2,14 @@
   hosts: jordanweb
 
   vars:
-    base_url: "{{ base_domain }}"
+    base_url: "blog.{{ base_web_domain }}"
     state: present
 
   tasks:
     - name: Install webserver deps
       become: true
       ansible.builtin.apt:
-        state: present
+        state: "{{ state }}"
         pkg:
         - git
         - apache2 
@@ -18,12 +18,18 @@
         - mariadb-server 
         - mariadb-client
         - python3-pymysql
+        - php-mysql
+
+    - name: Remove default index.html
+      ansible.builtin.file:
+        path: /var/www/html/index.html
+        state: absent
 
     - name: Configure Wordpress database
       become: true
       ansible.mariadb.mariadb_db:
         name: wordpressdb
-        state: present
+        state: "{{ state }}"
         login_unix_socket: /run/mysqld/mysqld.sock
 
     - name: Configure Wordpress database user
@@ -32,5 +38,21 @@
         name: wordpress_user
         password: "{{ jordanweb_wordpressdb }}" 
         priv: 'wordpressdb.*:ALL'
-        state: present
+        state: "{{ state }}"
         login_unix_socket: /run/mysqld/mysqld.sock
+
+    - name: Install Wordpress
+      become: true
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: https://wordpress.org/latest.tar.gz
+        dest: /var/www/html
+        creates: /var/www/html/index.php
+        extra_opts:
+          - --strip-components=1
+
+    - name: Configure Wordpress
+      become: true
+      ansible.builtin.template:
+        src: "{{ root_dir ~ '/templates/wordpress-config.php.j2' }}"
+        dest: /var/www/html/wp-config.php
