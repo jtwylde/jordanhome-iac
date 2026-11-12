@@ -154,6 +154,14 @@ static:
               description: ROM Library
               icon: sh-romm
               url: https://romm.jordanhome.dev
+            - title: PVE-0
+              description: PVE Node 0
+              icon: sh-proxmox
+              url: https://pve0.jordanhome.dev
+            - title: PVE-1
+              description: PVE Node 1
+              icon: sh-proxmox
+              url: https://pve1.jordanhome.dev
         - name: Media
           icon: fas fa-compact-disc
           items:
@@ -203,31 +211,6 @@ static:
 
         - name: Infrastructure
           icon: fas fa-server
-          widgets:
-            - type: proxmox-lists
-              useProxy: true 
-              options:
-                cluster_url: https://pve1.jordanhome.dev
-                user_name: root@pam
-                token_name: dashy
-                token_uuid: {{ dashy_pve_api_key }}
-                node: node0
-                node_data: qemu
-                title: Node-0 VMs
-                title_as_link: true
-                hide_templates: 1
-            - type: proxmox-lists
-              useProxy: true 
-              options:
-                cluster_url: https://pve2.jordanhome.dev
-                user_name: root@pam
-                token_name: dashy
-                token_uuid: {{ dashy_pve_api_key }}
-                node: node1
-                node_data: qemu
-                title: Node-1 VMs
-                title_as_link: true
-                hide_templates: 1
           items:
             - title: DNS
               description: DNS
@@ -237,6 +220,10 @@ static:
               description: NAS Storage
               icon: sh-synology
               url: https://nas.jordanhome.dev
+            - title: Cloudflare
+              description: Cloudflare Dashboard
+              icon: sh-cloudflare
+              url: https://dash.cloudflare.com
 
         - name: Do it for him
           icon: fas fa-heart

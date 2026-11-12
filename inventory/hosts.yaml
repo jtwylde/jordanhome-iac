@@ -2,14 +2,14 @@ all:
   children:
     vms:
       children:
-        webservers:
+        jordanweb:
           hosts:
-            jordanweb:
+            jordanweb-live:
               ansible_host: 192.168.1.185
               vmid: 185
               pve_node: node1
-              mem: 4096
-              cores: 2
+              mem: 2048
+              cores: 1
         k3s_nodes:
           hosts:
             k3s-node0:

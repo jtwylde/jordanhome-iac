@@ -21,6 +21,7 @@
         - php-mysql
 
     - name: Remove default index.html
+      become: true
       ansible.builtin.file:
         path: /var/www/html/index.html
         state: absent
