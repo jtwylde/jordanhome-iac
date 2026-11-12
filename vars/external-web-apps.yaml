@@ -11,12 +11,12 @@ webapps:
   amp:
     host: nuc
     web_port: 8080
-  pve1:
-    host: pve1
+  pve0:
+    host: pve0
     web_port: 8006
     backend_https: true
-  pve2:
-    host: pve2
+  pve1:
+    host: pve1
     web_port: 8006
     backend_https: true
   portainer:
