@@ -1,0 +1,36 @@
+- name: Setup immich
+  hosts: localhost
+
+  vars:
+    base_url: "photos.{{ base_domain }}"
+    issuer: "letsencrypt"
+    state: present
+    app: immich
+
+  environment: 
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
+
+  tasks:
+    - name: Deploy initial Immich resources
+      ansible.builtin.include_role:
+        name: k8s
+        tasks_from: apply-j2-templates-list.yaml
+      vars:
+        app: immich
+        resources: 
+          - namespace
+          - photo-library-pv
+          - photo-library-pvc
+          - postgres-cluster
+          - postgres-database
+          
+    - name: Deploy Immich
+      ansible.builtin.include_role:
+        name: k8s
+        tasks_from: apply-helm.yaml
+      vars:
+        repo_name: immich
+        repo_url: oci://ghcr.io/immich-app/immich-charts
+        chart_ref: oci://ghcr.io/immich-app/immich-charts/immich
+        deployment_namespace: immich
+        use_oci: true

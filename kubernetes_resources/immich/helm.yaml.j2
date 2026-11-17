@@ -1,0 +1,98 @@
+controllers:
+  main:
+    containers:
+      main:
+        image:
+          tag: v3.4.1
+        env:
+          DB_HOSTNAME: immich-database-rw
+          DB_USERNAME: immich
+          DB_DATABASE_NAME: immich
+          DB_PASSWORD:
+            valueFrom:
+              secretKeyRef:
+                name: immich-database-app
+                key: password
+
+immich:
+  metrics:
+    # Enabling this will create the service monitors needed to monitor immich with the prometheus operator
+    enabled: false
+  persistence:
+    # Main data store for all photos shared between different components.
+    library:
+      existingClaim: 'photo-library-pvc'
+
+  # configuration is immich-config.json converted to yaml. Ignored if existingConfiguration is set.
+  # ref: https://immich.app/docs/install/config-file/
+  #
+  configuration: {}
+  # Sets the resource Kind to store configuration in. Must be either ConfigMap or Secret.
+  configurationKind: ConfigMap
+
+# Dependencies
+
+valkey:
+  enabled: true
+  controllers:
+    main:
+      containers:
+        main:
+          image:
+            repository: docker.io/valkey/valkey
+            tag: 9.1.2-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11
+            pullPolicy: IfNotPresent
+  persistence:
+    data:
+      enabled: true
+      type: emptyDir
+# Immich components
+server:
+  enabled: true
+  controllers:
+    main:
+      containers:
+        main:
+          image:
+            repository: ghcr.io/immich-app/immich-server
+            pullPolicy: IfNotPresent
+  ingress:
+    main:
+      enabled: true
+      className: "traefik"
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: {{ issuer }}
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      hosts:
+        - host: {{ base_url }}
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - secretName: immich-web-cert
+          hosts:
+            - {{ base_url }}
+machine-learning:
+  enabled: false
+  controllers:
+    main:
+      containers:
+        main:
+          image:
+            repository: ghcr.io/immich-app/immich-machine-learning
+            pullPolicy: IfNotPresent
+          env:
+            TRANSFORMERS_CACHE: /cache
+            HF_XET_CACHE: /cache/huggingface-xet
+            MPLCONFIGDIR: /cache/matplotlib-config
+  persistence:
+    cache:
+      enabled: true
+      type: emptyDir
+      # Optional: to avoid downloading the ML models on every start, replace `type: emptyDir` above with:
+      #   type: persistentVolumeClaim
+      #   size: 10Gi
+      #   accessMode: ReadWriteMany
+      #   # storageClass: your-class
