@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: {{ issuer }}
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: wizarr
+  name: wizarr
+  namespace: jellyfin
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: wizarr.{{ base_url }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: wizarr
+            port:
+              name: http 
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - wizarr.{{ base_url }}
+    secretName: wizarr-web-cert
