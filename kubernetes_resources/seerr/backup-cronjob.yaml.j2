@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: jellyseerr-backup-cron
+  name: seerr-backup-cron
   namespace: jellyfin
 spec:
   schedule: "{{ config_backup_cron }}"
@@ -12,17 +12,17 @@ spec:
         spec:
           restartPolicy: OnFailure
           containers:
-            - name: jellyseerr-backup
+            - name: seerr-backup
               image: keinos/sqlite3:latest
               command:
                 - /bin/sh
                 - -c
                 - |
-                  mkdir -p /dest/jellyseerr/
+                  mkdir -p /dest/seerr/
                   sqlite3 /source/db/db.sqlite3 ".backup /tmp/db.sqlite3"
                   cp /source/settings.json /tmp/
-                  tar -czf "/dest/jellyseerr/jellyseerr-$(date +%Y-%m-%d).tar.gz" -C /tmp db.sqlite3 settings.json
-                  ls -1t /dest/jellyseerr/jellyseerr-*.tar.gz | tail -n +6 | xargs -r rm --
+                  tar -czf "/dest/seerr/seerr-$(date +%Y-%m-%d).tar.gz" -C /tmp db.sqlite3 settings.json
+                  ls -1t /dest/seerr/seerr-*.tar.gz | tail -n +6 | xargs -r rm --
 
               volumeMounts:
                 - name: source
@@ -34,7 +34,7 @@ spec:
           volumes:
             - name: source
               persistentVolumeClaim:
-                claimName: jellyseerr-config
+                claimName: seerr-config
             - name: dest
               persistentVolumeClaim:
                 claimName: media-config-backups-pvc
