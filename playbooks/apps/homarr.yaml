@@ -1,0 +1,29 @@
+- name: Setup Homarr
+  hosts: localhost
+
+  vars:
+    base_url: "{{ base_domain }}"
+    issuer: "letsencrypt"
+    state: present
+    app: homarr
+
+  environment: 
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig_location }}"
+
+  tasks:
+    - name: Create Homarr Namespace
+      ansible.builtin.include_role:
+        name: k8s
+        tasks_from: apply-j2-templates-list.yaml
+      vars:
+        resources: 
+          - namespace
+          - db-encryption-secret
+    - name: Deploy Homarr
+      ansible.builtin.include_role:
+        name: k8s
+        tasks_from: apply-helm.yaml
+      vars:
+        chart_ref: oci://ghcr.io/homarr-labs/charts/homarr
+        deployment_namespace: homarr
+        use_oci: true
